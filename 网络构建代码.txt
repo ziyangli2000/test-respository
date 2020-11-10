@@ -1,0 +1,65 @@
+import xlwt
+import networkx as nx
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+#读取表格
+node1 = []
+def excel_one_line_to_list():
+    node1_1 = pd.read_excel(r"4qdm_edges.xlsx",
+                          usecols = [0], names = None)
+    node1_li = node1_1.values.tolist()
+    for s1_li in node1_li:
+        node1.append(s1_li[0])
+    return node1
+
+if __name__ == '__main__':
+    excel_one_line_to_list()
+
+
+node2 = []
+def excel_one_line_to_list():
+    node2_1 = pd.read_excel(r"4qdm_edges.xlsx",
+                            usecols=[2],names=None)
+    node2_li = node2_1.values.tolist()
+    for s2_li in node2_li:
+        node2.append(s2_li[0])
+    return node2
+
+if __name__ == '__main__':
+    excel_one_line_to_list()
+
+#构建网络
+number = len(node1)
+weight = np.ones(number)
+
+n=1
+while n < number:
+    if node1[n-1] == node1[n] and node2[n-1] == node2[n]:
+        weight[n] = weight[n] + weight[n-1]
+        weight = np.delete(weight,n-1,axis=None)
+        node1 = np.delete(node1,n-1,axis=None)
+        node2 = np.delete(node2,n-1,axis=None)
+        number -= 1
+    n += 1
+
+#输出网络
+wbk = xlwt.Workbook()
+sheet = wbk.add_sheet('4qdm')
+
+for i in range(0,len(weight)):
+    sheet.write(i,0,node1[i])
+    sheet.write(i,1,node2[i])
+    sheet.write(i,2,weight[i])
+wbk.save('4qdm网络.xls')
+
+#可视化网络
+G = nx.Graph()
+
+number = len(node1)
+for e in range(0,number):
+    G.add_edge(node1[e],node2[e],weight = weight[e])
+
+nx.draw(G,node_size = 50)
+plt.show()
