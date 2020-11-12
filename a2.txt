@@ -1,1 +1,2 @@
-自己尝试git push一次
+welcome!
+己尝试git push一次
